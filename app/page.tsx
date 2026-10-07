@@ -412,7 +412,7 @@ export default function Home() {
       <div className={`fixed inset-0 w-full h-screen z-40 transition-all duration-[1200ms] ease-[cubic-bezier(0.25,1,0.5,1)] origin-center
         ${isShattered ? 'opacity-0 scale-[1.7] blur-xl pointer-events-none' : 'opacity-100 scale-100 blur-0'}`}>
         
-        <section id="gateway" className="h-full flex items-center p-4 sm:p-8 md:p-20 py-8 sm:py-12 relative z-10 w-full overflow-y-auto">
+        <section id="gateway" className="h-full flex items-center p-4 sm:p-8 md:p-20 py-8 sm:py-12 relative z-10 w-full overflow-hidden">
           <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none bg-[#05080C]">
             <video
               src="/section1.mp4"
