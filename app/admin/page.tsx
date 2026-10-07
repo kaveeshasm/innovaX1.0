@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, getDocs, doc, getDoc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -140,7 +142,17 @@ export default function AdminDashboard() {
     requestAction(
       "PHASE 1 OVERRIDE",
       `Are you sure you want to ${opening ? 'DEPLOY' : 'LOCK'} the Proposal Submission Phase?`,
-      async () => await updateDoc(doc(db, "settings", "public"), { phase1Open: opening })
+      async () => {
+        // Create an update object
+        const updateData: any = { phase1Open: opening };
+        
+        // If we are locking the phase, reset the deadline to an empty string
+        if (!opening) {
+          updateData.phase1Deadline = '';
+        }
+
+        await updateDoc(doc(db, "settings", "public"), updateData);
+      }
     );
   };
 
@@ -153,7 +165,17 @@ export default function AdminDashboard() {
     requestAction(
       "PHASE 2 OVERRIDE",
       `Are you sure you want to ${opening ? 'DEPLOY' : 'LOCK'} the Prototype Submission Phase?`,
-      async () => await updateDoc(doc(db, "settings", "public"), { phase2Open: opening })
+      async () => {
+        // Create an update object
+        const updateData: any = { phase2Open: opening };
+        
+        // If we are locking the phase, reset the deadline to an empty string
+        if (!opening) {
+          updateData.phase2Deadline = '';
+        }
+
+        await updateDoc(doc(db, "settings", "public"), updateData);
+      }
     );
   };
 
@@ -382,7 +404,19 @@ export default function AdminDashboard() {
               {systemConfig?.phase1Open ? 'Phase 1 is LIVE' : 'Phase 1 is LOCKED'}
             </button>
             <div className="flex gap-2">
-              <input type="datetime-local" value={p1Deadline} onChange={(e) => setP1Deadline(e.target.value)} className="bg-[#05080C] border border-white/10 rounded p-2 text-xs w-full focus:border-[#00E5FF]" />
+              <div className="w-full">
+                <DatePicker
+                  selected={p1Deadline ? new Date(p1Deadline) : null}
+                  onChange={(date: Date | null) => setP1Deadline(date ? date.toISOString() : '')}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="MMMM d, yyyy h:mm aa"
+                  placeholderText="Select Date & Time"
+                  className="bg-[#05080C] border border-white/10 rounded p-2 text-xs w-full focus:border-[#00E5FF] text-white"
+                  wrapperClassName="w-full"
+                />
+              </div>
               <button onClick={() => handleSetDeadline(1)} className="btn-outline-cyan text-[10px] px-3">SET</button>
             </div>
             
@@ -403,7 +437,19 @@ export default function AdminDashboard() {
               {systemConfig?.phase2Open ? 'Phase 2 is LIVE' : 'Phase 2 is LOCKED'}
             </button>
             <div className="flex gap-2">
-              <input type="datetime-local" value={p2Deadline} onChange={(e) => setP2Deadline(e.target.value)} className="bg-[#05080C] border border-white/10 rounded p-2 text-xs w-full focus:border-[var(--gold)]" />
+              <div className="w-full">
+                <DatePicker
+                  selected={p2Deadline ? new Date(p2Deadline) : null}
+                  onChange={(date: Date | null) => setP2Deadline(date ? date.toISOString() : '')}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="MMMM d, yyyy h:mm aa"
+                  placeholderText="Select Date & Time"
+                  className="bg-[#05080C] border border-white/10 rounded p-2 text-xs w-full focus:border-[var(--gold)] text-white"
+                  wrapperClassName="w-full"
+                />
+              </div>
               <button onClick={() => handleSetDeadline(2)} className="border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)]/10 rounded text-[10px] px-3">SET</button>
             </div>
 
@@ -419,17 +465,47 @@ export default function AdminDashboard() {
           </div>
 
         </div>
-
+        <br /><br /><br />
         <div className="glass-panel border-white/10 bg-[#121822]/50 p-6 mb-12">
-          <h2 className="text-[#00E5FF] font-mono text-xs tracking-[0.2em] uppercase mb-4">Judges Portal Access</h2>
+          <h2 className="text-[#00E5FF] font-mono text-xs tracking-[0.2em] uppercase mb-4">
+            Judges Portal Access
+          </h2>
+
+          {/* Judges Portal Link */}
+          <div className="mb-5">
+            <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-2">
+              Judges Portal URL
+            </p>
+
+            <a
+              href="/judges"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-[#00E5FF] font-mono text-sm hover:underline"
+            >
+              🔗 Open Judges Portal
+            </a>
+
+            <p className="text-gray-600 text-[10px] mt-2">
+              This link automatically works in both local development and production hosting.
+            </p>
+          </div>
+
+          {/* Passkey */}
           <div className="flex gap-4 items-center mb-4">
-            <input 
-              type="text" 
-              value={passkeyInput} 
-              onChange={(e) => setPasskeyInput(e.target.value)} 
+            <input
+              type="text"
+              value={passkeyInput}
+              onChange={(e) => setPasskeyInput(e.target.value)}
               className="bg-[#05080C] border border-white/10 rounded p-2 text-white font-mono text-sm w-full max-w-sm focus:border-[#00E5FF] focus:outline-none"
             />
-            <button onClick={updatePasskey} className="text-xs border border-[#00E5FF] text-[#00E5FF] hover:bg-[#00E5FF]/10 px-4 py-2 rounded transition-colors">UPDATE KEY</button>
+
+            <button
+              onClick={updatePasskey}
+              className="text-xs border border-[#00E5FF] text-[#00E5FF] hover:bg-[#00E5FF]/10 px-4 py-2 rounded transition-colors"
+            >
+              UPDATE KEY
+            </button>
           </div>
         </div>
 

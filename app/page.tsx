@@ -56,44 +56,44 @@ const TRACKS = [
 // --- UPDATED TIMELINE ROADMAP ---
 const TIMELINE = [
   {
-    date: 'AUGUST 25',
+    date: 'October 12',
     title: 'Registration Opening',
     desc: 'The gates open. Form your crew of 2–4 and claim your team slot before it fills.',
     side: 'right',
   },
   {
-    date: 'SEPTEMBER 02',
+    date: 'October 20',
     title: 'Registration Deadline',
     desc: 'The final call to secure your spot. Registrations officially close at midnight.',
     side: 'left',
   },
   {
-    date: 'SEPTEMBER 06',
+    date: 'October 10',
     title: 'Technical Session 02',
     desc: 'Join our expert speakers for a deep dive into building Agentic workflows and structuring your proposal.',
     side: 'right',
   },
   {
-    date: 'SEPTEMBER 08',
+    date: 'October 26',
     title: 'Proposal Submission',
     desc: 'Submit your architecture and technical plan. This single document decides who advances to the next stage.',
     side: 'left',
     tag: 'Crucial Phase',
   },
   {
-    date: 'SEPTEMBER 22',
+    date: 'November 04',
     title: 'Idea Submission Deadline',
     desc: 'Finalize and submit your refined model concepts for the upcoming prototype phase.',
     side: 'right',
   },
   {
-    date: 'OCTOBER 03',
+    date: 'November 15',
     title: 'Announce Top 10 Teams',
     desc: 'The judging panel reveals the official InnovaX Finalists who will compete in the live showdown.',
     side: 'left',
   },
   {
-    date: 'OCTOBER 10',
+    date: 'December 13',
     title: 'Final Round',
     desc: 'The Top 10 teams pitch and demo their Agentic AI builds live to the judging panel. Winners are announced!',
     side: 'right',
@@ -252,127 +252,7 @@ export default function Home() {
   const currentLogoBroken = Boolean(brokenPartnerLogos[currentPartner.logo]);
 
 
-  // --- CYBER CIRCUIT CANVAS COMPONENT ---
-function CircuitBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    
-    // Match parent size
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    const GRID_SIZE = 20;
-    const WIDTH = Math.floor(canvas.width / GRID_SIZE);
-    const HEIGHT = Math.floor(canvas.height / GRID_SIZE);
-
-    // Initialize Empty World
-    let WORLD = Array.from({ length: WIDTH }, () => Array(HEIGHT).fill(-1));
-    let WORLD_LINK: { a: number[]; b: number[]; c: number }[] = [];
-
-    // Seed the initial node in the center
-    WORLD[Math.floor(WIDTH / 2)][Math.floor(HEIGHT / 2)] = 0;
-
-    const animate = () => {
-      let score = 0;
-      let map = [];
-      for (let x = 0; x < WIDTH; x++) {
-        for (let y = 0; y < HEIGHT; y++) {
-          if (WORLD[x][y] !== -1) {
-            score++;
-            map.push([x, y]);
-          }
-        }
-      }
-
-      // Calculate how many nodes to sprout this frame
-      let stamina = Math.floor(score / 15) + 1;
-      while (map.length > 0 && stamina > 0) {
-        popTeam(0, map);
-        stamina--;
-      }
-    };
-
-    const popTeam = (team: number, map: number[][]) => {
-      const cell = map[Math.floor(Math.random() * map.length)];
-      const x = cell[0];
-      const y = cell[1];
-      const potential = [];
-
-      // Check valid neighbors
-      if (x > 0 && WORLD[x - 1][y] !== team) potential.push([x - 1, y]);
-      if (x < WIDTH - 1 && WORLD[x + 1][y] !== team) potential.push([x + 1, y]);
-      if (y > 0 && WORLD[x][y - 1] !== team) potential.push([x, y - 1]);
-      if (y < HEIGHT - 1 && WORLD[x][y + 1] !== team) potential.push([x, y + 1]);
-
-      if (potential.length) {
-        const p = potential[Math.floor(Math.random() * potential.length)];
-        WORLD[p[0]][p[1]] = team;
-        WORLD_LINK.push({ a: [x, y], b: [p[0], p[1]], c: team });
-      }
-    };
-
-    const render = () => {
-      // Clear frame
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const dx = Math.floor((canvas.width - WIDTH * GRID_SIZE) / 2);
-      const dy = Math.floor((canvas.height - HEIGHT * GRID_SIZE) / 2);
-
-      // Cyan color with opacity for the nodes
-      ctx.fillStyle = 'rgba(0, 229, 255, 0.4)';
-      for (let x = 0; x < WIDTH; x++) {
-        for (let y = 0; y < HEIGHT; y++) {
-          if (WORLD[x][y] !== -1) {
-            ctx.beginPath();
-            ctx.arc(x * GRID_SIZE + dx, y * GRID_SIZE + dy, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-      }
-
-      // Draw the connecting circuit lines
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)';
-      for (let i = 0; i < WORLD_LINK.length; i++) {
-        const link = WORLD_LINK[i];
-        if (WORLD[link.a[0]][link.a[1]] !== WORLD[link.b[0]][link.b[1]] || WORLD[link.a[0]][link.a[1]] !== link.c) {
-          WORLD_LINK.splice(i--, 1);
-          continue;
-        }
-        ctx.beginPath();
-        const ddx = link.a[0] - link.b[0];
-        const ddy = link.a[1] - link.b[1];
-        ctx.moveTo(link.a[0] * GRID_SIZE + dx - ddx * 5, link.a[1] * GRID_SIZE + dy - ddy * 5);
-        ctx.lineTo(link.b[0] * GRID_SIZE + dx + ddx * 5, link.b[1] * GRID_SIZE + dy + ddy * 5);
-        ctx.stroke();
-      }
-    };
-
-    const loop = () => {
-      animate();
-      render();
-      animationFrameId = requestAnimationFrame(loop);
-    };
-
-    loop();
-
-    // Cleanup on unmount
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
-  return (
-    <canvas 
-      ref={canvasRef} 
-      className="absolute inset-0 w-full h-full z-0 opacity-60 mix-blend-screen pointer-events-none" 
-    />
-  );
-}
 
   // ==========================================
   // UNIFIED SCROLL LOGIC
@@ -532,7 +412,7 @@ function CircuitBackground() {
       <div className={`fixed inset-0 w-full h-screen z-40 transition-all duration-[1200ms] ease-[cubic-bezier(0.25,1,0.5,1)] origin-center
         ${isShattered ? 'opacity-0 scale-[1.7] blur-xl pointer-events-none' : 'opacity-100 scale-100 blur-0'}`}>
         
-        <section id="gateway" className="h-full flex items-center p-8 md:p-20 relative z-10 w-full overflow-hidden">
+        <section id="gateway" className="h-full flex items-center p-4 sm:p-8 md:p-20 py-8 sm:py-12 relative z-10 w-full overflow-y-auto">
           <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none bg-[#05080C]">
             <video
               src="/section1.mp4"
@@ -547,30 +427,30 @@ function CircuitBackground() {
           </div>
           <div className="absolute inset-0 bg-[#05080C]/70 z-10 pointer-events-none" />
 
-          <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between relative z-20 gap-12">
+          <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between relative z-20 gap-8 lg:gap-12 my-auto">
             <div className="max-w-2xl relative z-20 flex-shrink-0">
-              <div className="badge-mono border-[#00E5FF]/40 text-[#00E5FF] bg-[#00E5FF]/[0.06] inline-block mb-6">
+              <div className="badge-mono border-[#00E5FF]/40 text-[#00E5FF] bg-[#00E5FF]/[0.06] inline-block mb-3 sm:mb-6 text-[10px] sm:text-xs">
                 IEEE Computer Society · SUSL Chapter Presents
               </div>
-              <img src="https://github.com/nngeek195/mywork/blob/b1/Pasted%20image.png?raw=true" alt="InnovaX Logo" className="w-full max-w-sm md:max-w-md mb-4 drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-              <h1 className="heading-glow font-display text-2xl md:text-3xl font-semibold text-white/90 tracking-wide mb-5">
+              <img src="https://github.com/nngeek195/mywork/blob/b1/Pasted%20image.png?raw=true" alt="InnovaX Logo" className="w-full max-w-[220px] sm:max-w-sm md:max-w-md mb-3 sm:mb-4 drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+              <h1 className="heading-glow font-display text-xl sm:text-2xl md:text-3xl font-semibold text-white/90 tracking-wide mb-3 sm:mb-5 !text-left !justify-start">
                 Observe <span className="heading-highlight">Reason</span> Execute
               </h1>
-              <p className="text-[var(--mist)] text-sm md:text-base leading-relaxed tracking-wide mb-8 max-w-xl">
+              <p className="text-[var(--mist)] text-xs sm:text-sm md:text-base leading-relaxed tracking-wide mb-6 sm:mb-8 max-w-xl">
                 An AI-focused idea hackathon bridging inventive thinking and Agentic AI solutions -
                 organised by the IEEE Computer Society Chapter of Sabaragamuwa University of Sri Lanka.
                 Form a crew, chart your proposal, and pitch your way to the treasury.
               </p>
-              <div className="flex flex-wrap gap-4 mb-12">
-                <a href="/dashboard" className="btn-outline-cyan">SUBMIT PROPOSAL</a>
-                <a href="/login" className="btn-outline-cyan border-white/20 text-white hover:border-[#00E5FF] hover:text-[#05080C] bg-transparent hover:bg-[#00E5FF]">SIGN IN</a>
+              <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-12">
+                <a href="/dashboard" className="btn-outline-cyan w-full sm:w-auto text-center justify-center">SUBMIT PROPOSAL</a>
+                <a href="/login" className="btn-outline-cyan border-white/20 text-white hover:border-[#00E5FF] hover:text-[#05080C] bg-transparent hover:bg-[#00E5FF] w-full sm:w-auto text-center justify-center">SIGN IN</a>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-lg border-t border-white/10 pt-8">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-lg border-t border-white/10 pt-5 sm:pt-8">
                 {STATS.map((s) => (
                   <div key={s.label}>
-                    <p className="font-mono text-lg md:text-xl font-semibold text-[#00E5FF]">{s.value}</p>
-                    <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--mist)] mt-1">
+                    <p className="font-mono text-base sm:text-lg md:text-xl font-semibold text-[#00E5FF]">{s.value}</p>
+                    <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-[var(--mist)] mt-1">
                       {s.label}
                     </p>
                   </div>
@@ -593,9 +473,9 @@ function CircuitBackground() {
 ========================================= */}
 <section
   id="chapters"
-  className="section-container pt-20 pb-20 w-full relative z-20"
+  className="section-container py-16 sm:py-20 w-full relative z-20"
 >
-  <Reveal className="w-full flex flex-col items-center text-center mb-10">
+  <Reveal className="w-full flex flex-col items-center text-center mb-8 sm:mb-10">
     <SectorTag n="01" label="CHAPTERS" />
 
     <h2 className="heading-glow justify-center">
@@ -611,136 +491,88 @@ function CircuitBackground() {
     </p>
   </Reveal>
 
-  <Reveal className="w-full flex justify-center h-[500px] mt-8 perspective-[70em]">
-    <div className="cyber-book relative h-[80%] max-h-[450px] min-h-[300px] w-full max-w-[800px] mx-auto border-2 border-[#00E5FF]/30 rounded-lg shadow-[0_0_80px_rgba(0,229,255,0.15)] transform-style-3d transition-shadow duration-500 hover:shadow-[0_0_120px_rgba(0,229,255,0.4)]">
+  {/* EMBEDDED GUIDEBOOK */}
+  <Reveal className="w-full flex flex-col items-center max-w-5xl mx-auto px-2 sm:px-4">
+    {/* Terminal / Cyber Header Bar */}
+    <div className="w-full bg-[#0a1018] border border-[#00E5FF]/30 rounded-t-xl sm:rounded-t-2xl px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between shadow-[0_0_30px_rgba(0,229,255,0.1)]">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80 inline-block" />
+          <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/80 inline-block" />
+          <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500/80 inline-block" />
+        </div>
+        <span className="font-mono text-[11px] sm:text-xs text-[#00E5FF] tracking-wider uppercase truncate max-w-[180px] sm:max-w-none">
+          DOC.VIEWER // INNOVAX_PROPOSAL_BOOKLET
+        </span>
+      </div>
 
-      {/* STATIC LEFT PAGE */}
-      <div className="absolute top-0 left-0 w-1/2 h-full z-0 flex flex-col items-center justify-center p-6 border-r border-[#00E5FF]/10 overflow-hidden">
-        <a href="#" className="flex flex-col items-center group/dl cursor-pointer z-10 w-full">
-          <div className="w-20 h-20 rounded-full border border-[#00E5FF]/50 flex items-center justify-center bg-[#00E5FF]/10 mb-6 group-hover/dl:bg-[#00E5FF]/30 transition-all duration-300 shadow-[0_0_20px_rgba(0,229,255,0.2)] group-hover/dl:shadow-[0_0_40px_rgba(0,229,255,0.6)] group-hover/dl:scale-110">
-            <svg
-              className="w-10 h-10 text-[#00E5FF] animate-bounce"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-          </div>
-
-          <span className="font-display text-white text-base md:text-lg tracking-widest text-center">
-            DOWNLOAD
-            <br />
-            DELEGATE BOOK
-          </span>
+      <div className="flex items-center gap-2 sm:gap-4">
+        <span className="font-mono text-[10px] text-[var(--mist)] uppercase tracking-widest hidden md:inline-block">
+          INTERACTIVE FLIPBOOK
+        </span>
+        <a
+          href="https://online.anyflip.com/xrsxp/xepc/index.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-[11px] sm:text-xs text-[#00E5FF] hover:text-white bg-[#00E5FF]/10 hover:bg-[#00E5FF]/20 border border-[#00E5FF]/40 rounded-full px-3 py-1 transition-all duration-300 flex items-center gap-1.5 shrink-0"
+          title="Open booklet in full window"
+        >
+          <span>FULLSCREEN</span>
+          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
         </a>
       </div>
+    </div>
 
-      {/* PAGE 1 */}
-      <div
-        className="cyber-page z-[3]"
-        onClick={(e) => e.currentTarget.classList.toggle('flipped')}
-      >
-        <div className="cyber-side side-1 flex flex-col items-center justify-center text-center overflow-hidden group">
-          <CircuitBackground />
+    {/* Iframe Frame Container */}
+    <div className="w-full relative bg-[#05080C] border-x border-b border-[#00E5FF]/30 rounded-b-xl sm:rounded-b-2xl p-1.5 sm:p-3 shadow-[0_10px_60px_rgba(0,229,255,0.15)] overflow-hidden">
+      <div className="w-full h-[360px] sm:h-[460px] md:h-[540px] lg:h-[600px] rounded-lg sm:rounded-xl overflow-hidden bg-black/60 relative">
+        <iframe
+          src="https://online.anyflip.com/xrsxp/xepc/index.html"
+          allowFullScreen={true}
+          title="InnovaX Delegate Booklet"
+          className="w-full h-full border-0"
+          style={{ width: '100%', height: '100%' }}
+        />
+      </div>
+    </div>
 
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="w-16 h-16 border border-[#00E5FF]/40 rounded-full flex items-center justify-center mb-4">
-              <span className="font-mono text-xs text-[#00E5FF] tracking-widest">
-                INIT
+    {/* Guide Controls Hint */}
+    <div className="mt-3 sm:mt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[11px] sm:text-xs font-mono text-[var(--mist)] text-center">
+      <span className="flex items-center gap-1.5">
+        <span className="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse" />
+        Click or drag page corners to flip
+      </span>
+      <span className="hidden sm:inline text-white/20">•</span>
+      <span>Use bottom toolbar inside reader to zoom or expand full view</span>
+    </div>
+
+    {/* TRACK CARDS */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 w-full mt-10 sm:mt-14">
+      {TRACKS.map((t) => (
+        <div
+          key={t.code}
+          className="glass-panel relative flex flex-col justify-between group hover:border-[#00E5FF]/60 hover:shadow-[0_0_25px_rgba(0,229,255,0.2)] transition-all duration-300"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-xs text-[#00E5FF] bg-[#00E5FF]/10 border border-[#00E5FF]/20 px-2.5 py-1 rounded">
+                {t.code}
               </span>
+              <span className="w-2 h-2 rounded-full bg-[#00E5FF]/40 group-hover:bg-[#00E5FF] transition-colors" />
             </div>
 
-            <h3 className="font-display text-3xl font-bold text-white tracking-widest mb-2">
-              EXPEDITION
+            <h3 className="font-display text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3 group-hover:text-[#00E5FF] transition-colors">
+              {t.title}
             </h3>
 
-            <p className="text-[var(--mist)] text-sm font-mono tracking-[0.3em] mt-2">
-              MANIFESTO
+            <p className="text-xs sm:text-sm text-[var(--mist)] leading-relaxed">
+              {t.desc}
             </p>
-
-            <div className="mt-12 badge-mono border-[#00E5FF]/40 text-[#00E5FF] bg-[#00E5FF]/20">
-              CLICK TO OPEN
-            </div>
           </div>
         </div>
-
-        <div className="cyber-side side-2 flex flex-col justify-center group">
-          <span className="font-mono text-xs text-[#00E5FF] bg-[#00E5FF]/10 px-2 py-1 rounded inline-block w-max mb-4">
-            {TRACKS[0].code}
-          </span>
-
-          <h3 className="font-display text-2xl font-bold text-white mb-4">
-            {TRACKS[0].title}
-          </h3>
-
-          <p className="text-base text-[var(--mist)] leading-relaxed">
-            {TRACKS[0].desc}
-          </p>
-        </div>
-      </div>
-
-      {/* PAGE 2 */}
-      <div
-        className="cyber-page z-[2]"
-        onClick={(e) => e.currentTarget.classList.toggle('flipped')}
-      >
-        <div className="cyber-side side-1 flex flex-col justify-center group">
-          <span className="font-mono text-xs text-[#00E5FF] bg-[#00E5FF]/10 px-2 py-1 rounded inline-block w-max mb-4">
-            {TRACKS[1].code}
-          </span>
-
-          <h3 className="font-display text-2xl font-bold text-white mb-4">
-            {TRACKS[1].title}
-          </h3>
-
-          <p className="text-base text-[var(--mist)] leading-relaxed">
-            {TRACKS[1].desc}
-          </p>
-        </div>
-
-        <div className="cyber-side side-2 flex flex-col justify-center group">
-          <span className="font-mono text-xs text-[#00E5FF] bg-[#00E5FF]/10 px-2 py-1 rounded inline-block w-max mb-4">
-            {TRACKS[2].code}
-          </span>
-
-          <h3 className="font-display text-2xl font-bold text-white mb-4">
-            {TRACKS[2].title}
-          </h3>
-
-          <p className="text-base text-[var(--mist)] leading-relaxed">
-            {TRACKS[2].desc}
-          </p>
-        </div>
-      </div>
-
-      {/* PAGE 3 */}
-      <div
-        className="cyber-page z-[1]"
-        onClick={(e) => e.currentTarget.classList.toggle('flipped')}
-      >
-        <div className="cyber-side side-1 flex flex-col items-center justify-center text-center group">
-          <h3 className="font-display text-xl font-bold text-white mb-4">
-            CHOOSE YOUR PATH
-          </h3>
-
-          <p className="text-sm text-[var(--mist)] max-w-[80%]">
-            Select one track and spend six weeks turning your idea into a
-            working Agentic AI proposal.
-          </p>
-        </div>
-
-        <div className="cyber-side side-2 flex items-center justify-center">
-          <p className="font-mono text-xs text-[var(--mist)]/40 tracking-[0.5em]">
-            SYSTEM_END
-          </p>
-        </div>
-      </div>
+      ))}
     </div>
   </Reveal>
 </section>
@@ -767,62 +599,63 @@ function CircuitBackground() {
     </p>
   </Reveal>
 
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-16 w-full max-w-5xl mx-auto items-stretch mt-8">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10 w-full max-w-5xl mx-auto items-stretch mt-8">
 
-    <Reveal delay={0} className="h-full">
-      <div className="glass-panel text-center h-full flex flex-col items-center">
-        <h3 className="text-lg text-[var(--gold)] tracking-widest uppercase font-bold">
-          1st Runner Up
-        </h3>
-
-        <img
-          src={second.src}
-          className="w-40 h-40 object-contain"
-          alt="1st Runner Up"
-        />
-
-        <p className="text-2xl font-bold text-[#00E5FF] mt-4">
+    {/* 1st Runner Up: order-2 on mobile, order-1 on desktop */}
+    <Reveal delay={0} className="h-full order-2 md:order-1">
+      <div className="glass-panel text-center h-full flex flex-col items-center justify-between p-6">
+        <div>
+          <h3 className="text-base sm:text-lg text-[var(--gold)] tracking-widest uppercase font-bold">
+            1st Runner Up
+          </h3>
+          <img
+            src={second.src}
+            className="w-32 h-32 sm:w-40 sm:h-40 object-contain mx-auto mt-2"
+            alt="1st Runner Up"
+          />
+        </div>
+        <p className="text-xl sm:text-2xl font-bold text-[#00E5FF] mt-4">
           LKR 30,000
         </p>
       </div>
     </Reveal>
 
-
-    <Reveal delay={120} className="h-full">
-      <div className="glass-panel text-center border-[var(--gold)]/40 relative overflow-hidden h-full flex flex-col items-center shadow-[0_0_30px_rgba(0,229,255,0.12)]">
-
+    {/* Championship: order-1 on mobile, order-2 on desktop */}
+    <Reveal delay={120} className="h-full order-1 md:order-2 md:-translate-y-3">
+      <div className="glass-panel text-center border-[var(--gold)]/40 relative overflow-hidden h-full flex flex-col items-center justify-between p-6 shadow-[0_0_30px_rgba(0,229,255,0.18)]">
         <div className="absolute inset-0 bg-gradient-to-b from-[var(--gold)]/10 to-transparent z-0 pointer-events-none" />
 
-        <h3 className="text-xl text-[var(--gold)] tracking-widest uppercase relative z-10 font-bold">
-          Championship
-        </h3>
+        <div className="relative z-10">
+          <h3 className="text-lg sm:text-xl text-[var(--gold)] tracking-widest uppercase font-bold">
+            Championship
+          </h3>
+          <img
+            src={first.src}
+            className="w-36 h-36 sm:w-44 sm:h-44 object-contain relative z-10 mx-auto mt-2"
+            alt="Championship"
+          />
+        </div>
 
-        <img
-          src={first.src}
-          className="w-40 h-40 object-contain relative z-10"
-          alt="Championship"
-        />
-
-        <p className="text-3xl font-black text-[var(--gold)] relative z-10 mt-4">
+        <p className="text-2xl sm:text-3xl font-black text-[var(--gold)] relative z-10 mt-4">
           LKR 50,000
         </p>
       </div>
     </Reveal>
 
-
-    <Reveal delay={240} className="h-full">
-      <div className="glass-panel text-center h-full flex flex-col items-center">
-        <h3 className="text-lg text-[var(--gold)] tracking-widest uppercase font-bold">
-          2nd Runner Up
-        </h3>
-
-        <img
-          src={third.src}
-          className="w-40 h-40 object-contain"
-          alt="2nd Runner Up"
-        />
-
-        <p className="text-2xl font-bold text-[#00E5FF] mt-4">
+    {/* 2nd Runner Up: order-3 */}
+    <Reveal delay={240} className="h-full order-3 md:order-3">
+      <div className="glass-panel text-center h-full flex flex-col items-center justify-between p-6">
+        <div>
+          <h3 className="text-base sm:text-lg text-[var(--gold)] tracking-widest uppercase font-bold">
+            2nd Runner Up
+          </h3>
+          <img
+            src={third.src}
+            className="w-32 h-32 sm:w-40 sm:h-40 object-contain mx-auto mt-2"
+            alt="2nd Runner Up"
+          />
+        </div>
+        <p className="text-xl sm:text-2xl font-bold text-[#00E5FF] mt-4">
           LKR 20,000
         </p>
       </div>
@@ -834,7 +667,7 @@ function CircuitBackground() {
         {/* =========================================
             JOURNEY (Sector 03) - Vertical Scroll
         ========================================= */}
-        <section id="journey" className="section-container pt-20 pb-20">
+        <section id="journey" className="section-container pt-16 sm:pt-20 pb-16 sm:pb-20">
           <Reveal className="w-full flex flex-col items-center text-center">
             <SectorTag n="03" label="JOURNEY" />
             <h2 className="heading-glow justify-center">
@@ -845,54 +678,73 @@ function CircuitBackground() {
             </p>
           </Reveal>
 
-          <div className="relative w-full max-w-3xl mx-auto py-10">
-            <div className="absolute left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#00E5FF]/60 via-white/10 to-[var(--gold)]/60" />
+          <div className="relative w-full max-w-3xl mx-auto py-6 sm:py-10 px-2 sm:px-0">
+            {/* Timeline track: left-4 on mobile, center on desktop */}
+            <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#00E5FF]/60 via-white/10 to-[var(--gold)]/60" />
 
             {TIMELINE.map((item, i) => (
-              <Reveal key={item.title} delay={i * 100}>
-                {/* --- ADDED 'group cursor-default' to trigger hover state across the entire row --- */}
-                <div className="relative flex items-center justify-between w-full mb-12 group cursor-default">
+              <Reveal key={item.title} delay={i * 80}>
+                <div className="relative flex items-center w-full mb-8 sm:mb-12 group cursor-default">
+                  {/* Bubble Lights up on track */}
+                  <span className={`absolute left-4 md:left-1/2 -translate-x-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full animate-ping transition-all duration-300 group-hover:!bg-white group-hover:!shadow-[0_0_20px_#ffffff] z-10 ${item.gold ? 'bg-[var(--gold)] shadow-[0_0_12px_var(--gold)]' : 'bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]'}`} />
+                  <span className={`absolute left-4 md:left-1/2 -translate-x-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full transition-all duration-300 group-hover:!bg-white group-hover:!shadow-[0_0_20px_#ffffff] z-10 ${item.gold ? 'bg-[var(--gold)] shadow-[0_0_12px_var(--gold)]' : 'bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]'}`} />
+
                   {item.side === 'right' ? (
-                    <>
-                      <div className="w-5/12 text-right pr-8 bg-[#121822] pt-4 pb-4 rounded-xl transition-colors duration-300 group-hover:bg-[#1a2233]">
-                        <div className={`w-8/12 pl-8 text-left font-mono font-bold text-sm tracking-widest ${item.gold ? 'text-[var(--gold)]' : 'text-[#00E5FF]'}`}>
+                    <div className="w-full flex items-center md:justify-between">
+                      {/* Desktop: Left side card */}
+                      <div className="hidden md:block w-5/12 text-right pr-6 lg:pr-8 bg-[#121822] p-4 lg:p-5 rounded-xl transition-colors duration-300 group-hover:bg-[#1a2233]">
+                        <div className={`font-mono font-bold text-xs sm:text-sm tracking-widest ${item.gold ? 'text-[var(--gold)]' : 'text-[#00E5FF]'}`}>
                           {item.date}
                         </div>
-                        {/* --- Title Underline on Hover --- */}
-                        <h3 className="font-display text-lg font-bold text-white inline-block relative after:absolute after:bottom-0 after:left-0 after:w-0 group-hover:after:w-full after:h-[2px] after:bg-[#00E5FF] after:transition-all after:duration-300">
+                        {item.tag && <span className="badge-mono border-[#00E5FF]/50 bg-[#00E5FF] text-[#05080C] mt-1.5 mb-1 inline-block">{item.tag}</span>}
+                        <h3 className="font-display text-base sm:text-lg font-bold text-white inline-block relative after:absolute after:bottom-0 after:left-0 after:w-0 group-hover:after:w-full after:h-[2px] after:bg-[#00E5FF] after:transition-all after:duration-300 mt-1">
                           {item.title}
                         </h3>
-                        <p className="text-sm text-[var(--mist)] mt-2">{item.desc}</p>
+                        <p className="text-xs sm:text-sm text-[var(--mist)] mt-2">{item.desc}</p>
                       </div>
-                      
-                      {/* --- Bubble Lights up White on Hover --- */}
-                      <span className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full animate-ping transition-all duration-300 group-hover:!bg-white group-hover:!shadow-[0_0_20px_#ffffff] ${item.gold ? 'bg-[var(--gold)] shadow-[0_0_12px_var(--gold)]' : 'bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]'}`} />
-                      <span className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full transition-all duration-300 group-hover:!bg-white group-hover:!shadow-[0_0_20px_#ffffff] ${item.gold ? 'bg-[var(--gold)] shadow-[0_0_12px_var(--gold)]' : 'bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]'}`} />
-                      
-                      <div className="w-5/12"></div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-5/12 text-right pr-8"></div>
-                      
-                      {/* --- Bubble Lights up White on Hover --- */}
-                      <span className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full animate-ping transition-all duration-300 group-hover:!bg-white group-hover:!shadow-[0_0_20px_#ffffff] ${item.gold ? 'bg-[var(--gold)] shadow-[0_0_12px_var(--gold)]' : 'bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]'}`} />
-                      <span className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full transition-all duration-300 group-hover:!bg-white group-hover:!shadow-[0_0_20px_#ffffff] ${item.gold ? 'bg-[var(--gold)] shadow-[0_0_12px_var(--gold)]' : 'bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]'}`} />
-                      
-                      <div className="w-5/12 pl-8 text-left bg-[#121822] pt-4 pb-4 rounded-xl transition-colors duration-300 group-hover:bg-[#1a2233]">
-                        <div className={`w-8/12 text-left pr-6 pb-4 font-mono font-bold text-sm tracking-widest ${item.gold ? 'text-[var(--gold)]' : 'text-[#00E5FF]'}`}>
+
+                      <div className="hidden md:block w-5/12" />
+
+                      {/* Mobile: Full-width card to the right of track */}
+                      <div className="md:hidden w-[calc(100%-2.25rem)] ml-9 text-left bg-[#121822] p-4 rounded-xl transition-colors duration-300 group-hover:bg-[#1a2233]">
+                        <div className={`font-mono font-bold text-xs tracking-widest ${item.gold ? 'text-[var(--gold)]' : 'text-[#00E5FF]'}`}>
                           {item.date}
                         </div>
-                        {item.tag && <span className="badge-mono border-[#00E5FF]/50 bg-[#00E5FF] text-[#05080C] mb-2 inline-block">{item.tag}</span>}
-                        <div className="w-full">
-                           {/* --- Title Underline on Hover --- */}
-                          <h3 className="font-display text-lg font-bold text-white inline-block relative after:absolute after:bottom-0 after:left-0 after:w-0 group-hover:after:w-full after:h-[2px] after:bg-[#00E5FF] after:transition-all after:duration-300">
-                            {item.title}
-                          </h3>
-                        </div>
-                        <p className="text-sm text-[var(--mist)] mt-2">{item.desc}</p>
+                        {item.tag && <span className="badge-mono border-[#00E5FF]/50 bg-[#00E5FF] text-[#05080C] my-1 inline-block text-[10px]">{item.tag}</span>}
+                        <h3 className="font-display text-base font-bold text-white block mt-1">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-[var(--mist)] mt-1.5 leading-relaxed">{item.desc}</p>
                       </div>
-                    </>
+                    </div>
+                  ) : (
+                    <div className="w-full flex items-center md:justify-between">
+                      <div className="hidden md:block w-5/12 text-right pr-8" />
+
+                      {/* Desktop: Right side card */}
+                      <div className="hidden md:block w-5/12 pl-6 lg:pl-8 text-left bg-[#121822] p-4 lg:p-5 rounded-xl transition-colors duration-300 group-hover:bg-[#1a2233]">
+                        <div className={`font-mono font-bold text-xs sm:text-sm tracking-widest ${item.gold ? 'text-[var(--gold)]' : 'text-[#00E5FF]'}`}>
+                          {item.date}
+                        </div>
+                        {item.tag && <span className="badge-mono border-[#00E5FF]/50 bg-[#00E5FF] text-[#05080C] mt-1.5 mb-1 inline-block">{item.tag}</span>}
+                        <h3 className="font-display text-base sm:text-lg font-bold text-white inline-block relative after:absolute after:bottom-0 after:left-0 after:w-0 group-hover:after:w-full after:h-[2px] after:bg-[#00E5FF] after:transition-all after:duration-300 mt-1">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-[var(--mist)] mt-2">{item.desc}</p>
+                      </div>
+
+                      {/* Mobile: Full-width card to the right of track */}
+                      <div className="md:hidden w-[calc(100%-2.25rem)] ml-9 text-left bg-[#121822] p-4 rounded-xl transition-colors duration-300 group-hover:bg-[#1a2233]">
+                        <div className={`font-mono font-bold text-xs tracking-widest ${item.gold ? 'text-[var(--gold)]' : 'text-[#00E5FF]'}`}>
+                          {item.date}
+                        </div>
+                        {item.tag && <span className="badge-mono border-[#00E5FF]/50 bg-[#00E5FF] text-[#05080C] my-1 inline-block text-[10px]">{item.tag}</span>}
+                        <h3 className="font-display text-base font-bold text-white block mt-1">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-[var(--mist)] mt-1.5 leading-relaxed">{item.desc}</p>
+                      </div>
+                    </div>
                   )}
                 </div>
               </Reveal>
@@ -943,8 +795,8 @@ function CircuitBackground() {
                           );
                         })}
                       </div>
-                      <div className="partner-details" aria-live="polite">
-                        <div className="partner-logo-frame" style={{ backgroundColor: currentPartner.logoBg }}>
+                      <div className="partner-details flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-5" aria-live="polite">
+                        <div className="partner-logo-frame shrink-0" style={{ backgroundColor: currentPartner.logoBg }}>
                           {!currentLogoBroken && (
                             <img
                               key={currentPartner.logo}
@@ -974,8 +826,8 @@ function CircuitBackground() {
                         </div>
                         <div>
                           <p className="partner-tier">{currentPartner.tier} Partner</p>
-                          <h3 className="partner-company font-display text-xl md:text-2xl font-bold">{currentPartner.company}</h3>
-                          <p className="text-sm text-[var(--mist)] mt-2 leading-relaxed max-w-xl">{currentPartner.description}</p>
+                          <h3 className="partner-company font-display text-lg sm:text-xl md:text-2xl font-bold">{currentPartner.company}</h3>
+                          <p className="text-xs sm:text-sm text-[var(--mist)] mt-2 leading-relaxed max-w-xl">{currentPartner.description}</p>
                         </div>
                       </div>
                     </div>
@@ -996,7 +848,7 @@ function CircuitBackground() {
                     </p>
                   </Reveal>
 
-                  <div className="w-full max-w-3xl flex flex-col gap-3">
+                  <div className="w-full max-w-3xl flex flex-col gap-2.5 sm:gap-3 px-2 sm:px-0">
                     {FAQS.map((f, i) => {
                       const open = openFaq === i;
                       return (
@@ -1005,15 +857,15 @@ function CircuitBackground() {
                             <button
                               onClick={() => setOpenFaq(open ? null : i)}
                               aria-expanded={open}
-                              className="w-full flex items-center justify-between gap-4 text-left px-6 py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/60"
+                              className="w-full flex items-center justify-between gap-3 text-left px-4 sm:px-6 py-4 sm:py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/60"
                             >
-                              <span className="font-display text-sm md:text-base font-semibold text-white">
+                              <span className="font-display text-xs sm:text-sm md:text-base font-semibold text-white">
                                 {f.q}
                               </span>
                               <div
-                                className={`shrink-0 w-7 h-7 rounded-full border border-[#00E5FF] flex items-center justify-center text-[#00E5FF]`}
+                                className={`shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00E5FF] flex items-center justify-center text-[#00E5FF]`}
                               >
-                                <FaPlus className={`w-4 h-4 transition-transform duration-300 ${
+                                <FaPlus className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-300 ${
                                   open ? 'rotate-45' : ''
                                 }`} />
                               </div>
@@ -1023,7 +875,7 @@ function CircuitBackground() {
                               style={{ gridTemplateRows: open ? '1fr' : '0fr' }}
                             >
                               <div className="overflow-hidden">
-                                <p className="text-sm text-[var(--mist)] leading-relaxed px-6 pb-6">{f.a}</p>
+                                <p className="text-xs sm:text-sm text-[var(--mist)] leading-relaxed px-4 sm:px-6 pb-4 sm:pb-6">{f.a}</p>
                               </div>
                             </div>
                           </div>
@@ -1041,10 +893,10 @@ function CircuitBackground() {
         {/* =========================================
             DARK MARGIN (System Checkpoint Spacer)
         ========================================= */}
-        <div className="w-full h-32 bg-[#05080C] relative z-30 border-y border-[#121822] shadow-[0_0_50px_rgba(0,0,0,0.8)] flex items-center justify-center">
+        <div className="w-full h-24 sm:h-32 bg-[#05080C] relative z-30 border-y border-[#121822] shadow-[0_0_50px_rgba(0,0,0,0.8)] flex items-center justify-center">
           <div className="w-full max-w-7xl mx-auto px-6 flex items-center gap-4 opacity-40">
             <div className="h-px bg-gradient-to-r from-transparent via-[#00E5FF]/50 to-transparent flex-1" />
-            <span className="font-mono text-[10px] tracking-[0.3em] text-[#00E5FF]">SYSTEM CHECKPOINT</span>
+            <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.3em] text-[#00E5FF]">SYSTEM CHECKPOINT</span>
             <div className="h-px bg-gradient-to-r from-transparent via-[#00E5FF]/50 to-transparent flex-1" />
           </div>
         
@@ -1069,46 +921,45 @@ function CircuitBackground() {
           </div>
 
           <section id="register" className="flex flex-col items-center justify-center pt-16 pb-2 w-full text-center relative z-10">
-            <Reveal className="flex flex-col items-center px-6">
+            <Reveal className="flex flex-col items-center px-4 sm:px-6">
               <SectorTag n="06" label="REGISTER" />
-              <h2 className="font-display text-4xl md:text-6xl font-black tracking-widest uppercase text-white mb-8">
+              <h2 className="font-display text-3xl sm:text-4xl md:text-6xl font-black tracking-widest uppercase text-white mb-6 sm:mb-8 text-center px-2">
                 READY TO <span className="heading-highlight">DIVE IN?</span>
               </h2>
               
-              {/* Replace the '#' with your actual Google Form or registration link */}
               <a 
                 href="/register" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="btn-solid-cyan inline-block mb-0"
+                className="btn-solid-cyan inline-block mb-0 text-center"
               >
                 REGISTER NOW
               </a>
             </Reveal>
           </section>
 
-          <div className="w-full pt-12 pb-48 flex flex-col items-center relative z-20 border-t border-[#121822]/50">
-            <Reveal className="w-full max-w-4xl flex flex-col items-center px-6">
-              <p className="text-[var(--mist)] italic text-sm mb-12 text-center">
+          <div className="w-full pt-12 pb-44 sm:pb-48 flex flex-col items-center relative z-20 border-t border-[#121822]/50">
+            <Reveal className="w-full max-w-4xl flex flex-col items-center px-4 sm:px-6">
+              <p className="text-[var(--mist)] italic text-xs sm:text-sm mb-10 sm:mb-12 text-center">
                 &ldquo;Every great journey begins with a conversation.&rdquo;
               </p>
 
-              <div className="flex flex-wrap justify-center gap-4 mb-8">
-                <a href="mailto:ssomaweera@foc.sab.ac.lk" className="group border border-[#121822] rounded-full px-6 py-3 text-xs text-[var(--mist)] hover:text-white hover:border-[#00E5FF] bg-[#121822]/50 hover:bg-[#121822] transition-all duration-300 flex items-center gap-3">
-                  <svg className="w-4 h-4 text-[#00E5FF] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 max-w-full px-2">
+                <a href="mailto:ssomaweera@foc.sab.ac.lk" className="group border border-[#121822] rounded-full px-4 sm:px-6 py-2.5 sm:py-3 text-[11px] sm:text-xs text-[var(--mist)] hover:text-white hover:border-[#00E5FF] bg-[#121822]/50 hover:bg-[#121822] transition-all duration-300 flex items-center gap-2 sm:gap-3 max-w-full truncate">
+                  <svg className="w-4 h-4 text-[#00E5FF] group-hover:scale-110 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  ssomaweera@foc.sab.ac.lk
+                  <span className="truncate">ssomaweera@foc.sab.ac.lk</span>
                 </a>
-                <a href="mailto:innovax.susl@gmail.com" className="group border border-[#121822] rounded-full px-6 py-3 text-xs text-[var(--mist)] hover:text-white hover:border-[#00E5FF] bg-[#121822]/50 hover:bg-[#121822] transition-all duration-300 flex items-center gap-3">
-                  <svg className="w-4 h-4 text-[#00E5FF] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <a href="mailto:innovax.susl@gmail.com" className="group border border-[#121822] rounded-full px-4 sm:px-6 py-2.5 sm:py-3 text-[11px] sm:text-xs text-[var(--mist)] hover:text-white hover:border-[#00E5FF] bg-[#121822]/50 hover:bg-[#121822] transition-all duration-300 flex items-center gap-2 sm:gap-3 max-w-full truncate">
+                  <svg className="w-4 h-4 text-[#00E5FF] group-hover:scale-110 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  innovax.susl@gmail.com
+                  <span className="truncate">innovax.susl@gmail.com</span>
                 </a>
               </div>
 
-              <div className="flex justify-center gap-4 mb-16">
+              <div className="flex justify-center gap-3 sm:gap-4 mb-12 sm:mb-16">
                 {[
                   { name: "LinkedIn", icon: <FaLinkedinIn />, href: "#" },
                   { name: "Facebook", icon: <FaFacebookF />, href: "#" },
@@ -1118,7 +969,7 @@ function CircuitBackground() {
                   <a
                     key={social.name}
                     href={social.href}
-                    className="w-10 h-10 rounded-full border border-[#FFFFFF] flex items-center justify-center
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#FFFFFF] flex items-center justify-center
                               hover:border-[#00E5FF] hover:bg-[#00E5FF]/10
                               text-[var(--mist)] hover:text-[#00E5FF]
                               hover:scale-110 hover:rotate-10"
@@ -1129,15 +980,15 @@ function CircuitBackground() {
                 ))}
               </div>
 
-              <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-8 w-full">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8 w-full">
                 <div className="flex items-center gap-4">
-                  <img src="https://github.com/nngeek195/mywork/blob/b1/Pasted%20image.png?raw=true" alt="InnovaX Small Logo" className="h-8 md:h-10 object-contain drop-shadow-[0_0_10px_rgba(0,229,255,0.3)]" />
+                  <img src="https://github.com/nngeek195/mywork/blob/b1/Pasted%20image.png?raw=true" alt="InnovaX Small Logo" className="h-7 sm:h-9 md:h-10 object-contain drop-shadow-[0_0_10px_rgba(0,229,255,0.3)]" />
                 </div>
-                <span className="hidden md:block w-px h-10 bg-white/20"></span>
-                <div><img src={CSChapterLogo.src} alt="IEEE Computer Society Chapter Logo" className="w-26 h-10" /></div>
+                <span className="hidden sm:block w-px h-8 sm:h-10 bg-white/20"></span>
+                <div><img src={CSChapterLogo.src} alt="IEEE Computer Society Chapter Logo" className="h-8 sm:h-10 w-auto object-contain" /></div>
               </div>
 
-              <div className="text-[10px] text-[var(--mist)]/50 uppercase tracking-widest font-mono flex flex-wrap justify-center items-center gap-3">
+              <div className="text-[9px] sm:text-[10px] text-[var(--mist)]/50 uppercase tracking-widest font-mono flex flex-wrap justify-center items-center gap-2 sm:gap-3 px-2">
                 <span>© InnovaX 2026.</span>
                 <span className="hidden md:inline">|</span>
                 <span>All Rights Reserved.</span>
@@ -1151,8 +1002,8 @@ function CircuitBackground() {
       {/* =========================================
           BOTTOM FIXED NAVIGATION
       ========================================= */}
-      <div className="fixed bottom-0 left-0 w-full h-16 bg-[#05080C]/90 backdrop-blur-md border-t border-white/10 z-[100] flex items-center justify-center overflow-x-auto">
-        <nav className="flex items-center gap-8 px-6 text-xs font-mono tracking-widest uppercase min-w-max h-full">
+      <div className="fixed bottom-0 left-0 w-full h-14 sm:h-16 bg-[#05080C]/90 backdrop-blur-md border-t border-white/10 z-[100] flex items-center justify-start md:justify-center overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <nav className="flex items-center gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6 text-[11px] sm:text-xs font-mono tracking-widest uppercase min-w-max h-full">
           {NAV_ITEMS.map((item) => {
             const active = activeSection === item.id;
             return (
