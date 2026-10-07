@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function SmoothFollower() {
+  // Assume touch until checked, so nothing flashes on mobile
+  const [isTouch, setIsTouch] = useState(true);
+
   // Actual mouse position
   const mousePosition = useRef({ x: 0, y: 0 });
 
@@ -26,10 +29,24 @@ export default function SmoothFollower() {
   const DOT_SMOOTHNESS = 0.2;
   const BORDER_DOT_SMOOTHNESS = 0.1;
 
+  // ------------------------------------------
+  // Detect touch devices
+  // ------------------------------------------
   useEffect(() => {
-    // ------------------------------------------
-    // Mouse movement
-    // ------------------------------------------
+    const mq = window.matchMedia("(hover: none), (pointer: coarse)");
+    setIsTouch(mq.matches);
+
+    const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  // ------------------------------------------
+  // Cursor logic (desktop only)
+  // ------------------------------------------
+  useEffect(() => {
+    if (isTouch) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       mousePosition.current = {
         x: e.clientX,
@@ -37,16 +54,8 @@ export default function SmoothFollower() {
       };
     };
 
-    // ------------------------------------------
-    // Hover detection
-    // ------------------------------------------
-    const handleMouseEnter = () => {
-      setIsHovering(true);
-    };
-
-    const handleMouseLeave = () => {
-      setIsHovering(false);
-    };
+    const handleMouseEnter = () => setIsHovering(true);
+    const handleMouseLeave = () => setIsHovering(false);
 
     window.addEventListener("mousemove", handleMouseMove);
 
@@ -60,48 +69,32 @@ export default function SmoothFollower() {
       element.addEventListener("mouseleave", handleMouseLeave);
     });
 
-    // ------------------------------------------
-    // Linear interpolation
-    // ------------------------------------------
-    const lerp = (
-      start: number,
-      end: number,
-      factor: number
-    ) => {
-      return start + (end - start) * factor;
-    };
+    const lerp = (start: number, end: number, factor: number) =>
+      start + (end - start) * factor;
 
-    // ------------------------------------------
-    // Animation
-    // ------------------------------------------
     const animate = () => {
-      // Inner dot
       dotPosition.current.x = lerp(
         dotPosition.current.x,
         mousePosition.current.x,
         DOT_SMOOTHNESS
       );
-
       dotPosition.current.y = lerp(
         dotPosition.current.y,
         mousePosition.current.y,
         DOT_SMOOTHNESS
       );
 
-      // Outer circle
       borderDotPosition.current.x = lerp(
         borderDotPosition.current.x,
         mousePosition.current.x,
         BORDER_DOT_SMOOTHNESS
       );
-
       borderDotPosition.current.y = lerp(
         borderDotPosition.current.y,
         mousePosition.current.y,
         BORDER_DOT_SMOOTHNESS
       );
 
-      // Update state
       setRenderPos({
         dot: {
           x: dotPosition.current.x,
@@ -113,43 +106,31 @@ export default function SmoothFollower() {
         },
       });
 
-      // Continue animation
       animationFrame.current = requestAnimationFrame(animate);
     };
 
-    // Start animation
     animationFrame.current = requestAnimationFrame(animate);
 
-    // ------------------------------------------
-    // Cleanup
-    // ------------------------------------------
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
 
       interactiveElements.forEach((element) => {
-        element.removeEventListener(
-          "mouseenter",
-          handleMouseEnter
-        );
-
-        element.removeEventListener(
-          "mouseleave",
-          handleMouseLeave
-        );
+        element.removeEventListener("mouseenter", handleMouseEnter);
+        element.removeEventListener("mouseleave", handleMouseLeave);
       });
 
       if (animationFrame.current !== null) {
         cancelAnimationFrame(animationFrame.current);
       }
     };
-  }, []);
+  }, [isTouch]);
+
+  // Render nothing on touch devices (must come AFTER all hooks)
+  if (isTouch) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[9999]">
-      
-      {/* =========================================
-          INNER DOT
-      ========================================= */}
+      {/* INNER DOT */}
       <div
         className="absolute rounded-full bg-[#00E5FF]"
         style={{
@@ -161,9 +142,7 @@ export default function SmoothFollower() {
         }}
       />
 
-      {/* =========================================
-          OUTER CIRCLE
-      ========================================= */}
+      {/* OUTER CIRCLE */}
       <div
         className="absolute rounded-full border border-[#00E5FF]"
         style={{
@@ -175,7 +154,6 @@ export default function SmoothFollower() {
           transition: "width 0.3s ease, height 0.3s ease",
         }}
       />
-
     </div>
   );
 }
