@@ -8,6 +8,7 @@ import CSChapterLogo from '../public/CSChapterLogo.png'
 import first from '../public/1st.png'
 import second from '../public/2nd.png'
 import third from '../public/3rd.png'
+import LoadingAnimation from './components/LoadingAnimation';
 
 const SmoothFollower = dynamic(() => import('./components/SmoothFollower'), { 
   ssr: false 
@@ -218,6 +219,22 @@ function GlassOverlay({ isShattered }: { isShattered: boolean }) {
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('gateway');
+  const [videosLoaded, setVideosLoaded] = useState({
+    gateway: false,
+    scrollVideo: false,
+  });
+
+  const handleVideoLoaded = (video: "gateway" | "scroll") => {
+    setVideosLoaded((prev) => ({
+      ...prev,
+      [video]: true,
+    }));
+  };
+
+  const allVideosLoaded =
+    videosLoaded.gateway &&
+    videosLoaded.scrollVideo;
+  
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activePartner, setActivePartner] = useState(0);
   const [brokenPartnerLogos, setBrokenPartnerLogos] = useState<Record<string, boolean>>({});
@@ -226,6 +243,7 @@ export default function Home() {
   const rootRef = useRef<HTMLElement>(null);
   const scrollVideoRef = useRef<HTMLVideoElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
+  const gatewayVideoRef = useRef<HTMLVideoElement>(null); 
 
   // Track 2: Partners & FAQ
   const horizontalContainerRef2 = useRef<HTMLDivElement>(null);
@@ -305,6 +323,21 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isShattered]);
 
+  useEffect(() => {
+    if (gatewayVideoRef.current && gatewayVideoRef.current.readyState >= 3) {
+      handleVideoLoaded("gateway");
+    }
+    if (scrollVideoRef.current && scrollVideoRef.current.readyState >= 3) {
+      handleVideoLoaded("scroll");
+    }
+
+    // Never block the site longer than 8 seconds
+    const timeout = setTimeout(() => {
+      setVideosLoaded({ gateway: true, scrollVideo: true });
+    }, 8000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   // ==========================================
   // REVEAL ANIMATIONS
   // ==========================================
@@ -351,6 +384,7 @@ export default function Home() {
   return (
     <>
     <SmoothFollower />
+    {!allVideosLoaded && <LoadingAnimation />}
     <main ref={rootRef} className="relative bg-transparent">
       {/* --- Base Backgrounds --- */}
       <div className="fixed inset-0 w-full h-full -z-20 bg-gradient-to-b from-[#0055FF]/12 via-[#05080C] to-[#05080C]" />
@@ -358,12 +392,14 @@ export default function Home() {
       
       {/* --- Scroll Scrubbing Video (Hidden by default, fades in at Section 2) --- */}
       <div className="fixed inset-0 w-full h-full z-[-15] overflow-hidden bg-[#05080C]">
-        <video 
-          ref={scrollVideoRef} 
-          src="/video_this_cyber_oql_fly_the.mp4" 
-          muted 
-          playsInline 
-          className="w-full h-full object-cover opacity-0 transition-opacity duration-700" 
+        <video
+          ref={scrollVideoRef}
+          src="/video_this_cyber_oql_fly_the.mp4"
+          muted
+          playsInline
+          preload="auto"
+          onCanPlay={() => handleVideoLoaded("scroll")}
+          className="w-full h-full object-cover opacity-0 transition-opacity duration-700"
         />
       </div>
 
@@ -378,7 +414,16 @@ export default function Home() {
         
         <section id="gateway" className="h-full flex items-center p-4 sm:p-8 md:p-20 py-8 sm:py-12 relative z-10 w-full overflow-y-auto">
           <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none bg-[#05080C]">
-            <video src="/section1.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover" />
+            <video
+              src="/section1.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              onCanPlay={() => handleVideoLoaded("gateway")}
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="absolute inset-0 bg-[#05080C]/70 z-10 pointer-events-none" />
 
@@ -862,7 +907,14 @@ export default function Home() {
         ========================================= */}
         <div className="relative w-full flex flex-col items-center justify-center overflow-hidden z-20">
           <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
-            <video src="/blue_power_owl.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover" />
+            <video
+              src="/blue_power_owl.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
             
             <div className="absolute inset-0 bg-[#05080C]/60 backdrop-blur-[2px]" />
             <div className="absolute bottom-0 left-0 w-full h-[60vh] bg-gradient-to-t from-[#05080C] via-[#05080C]/95 to-transparent z-10" />
